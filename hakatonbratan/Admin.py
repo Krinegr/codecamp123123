@@ -106,28 +106,3 @@ async def delete_record(message: types.Message,state:FSMContext):
         print("data:", data)
     await message.answer(f"Запись с ID {Id_To_Delete + 1} успешно удалена. Чтобы вернуться в режим удаления напишите /deleter")
     await state.clear()
-"""
-        with open("bdbd.json", 'r') as file:
-            bata = json.load(file)
-        result = '\n'.join([json.dumps(entry, indent=4) for entry in bata])
-        await message.reply(result)
-        print(result)
-"""
-
-"""
-    with open("bdbd.json", "r", encoding="utf-8") as file:
-        data = json.load(file)
-    new_data = [item for item in data if item["ID"] != args]
-    new_data = []
-    for g in data:
-        if g in data:
-            data.remove(g)
-
-    if len(new_data) == len(data):
-        await message.answer(f"Запись с ID {args} не найдена.")
-        return
-
-    with open("bdbd.json", "w", encoding="utf-8") as file:
-        json.dump(new_data, file, indent=4, ensure_ascii=False)
-
-"""
