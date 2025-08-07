@@ -1,8 +1,4 @@
-import asyncio
-import logging
-import os
-import re
-from aiogram import Bot, Dispatcher, types, Router
+from aiogram import types, Router
 from aiogram import F
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -40,6 +36,7 @@ async def IsUseradm(message: types.Message, state:FSMContext):
     if message.from_user.id == 1427364974:
         await message.answer(Hello_admin)
         return await state.set_state(Helper.Delete_input)
+    return None
 @router.message(F.text.lower() == "просмотреть запросы")
 async def with_puree(message: types.Message):
     if message.from_user.id == 1427364974:
@@ -86,23 +83,26 @@ async def handle_id_button(message: types.Message, state:FSMContext):
             await message.answer("Запись не найдена.")
 
 
-@router.message(F.text,Helper.Delete_input)
-async def handle_id_button(message: types.Message, state:FSMContext):
-    text=message.text
-    if text == 'dedeleter':
+@router.message(F.text, Helper.Delete_input)
+async def delete_record(message: types.Message, state: FSMContext):
+    text = message.text.strip()  # Убираем лишние пробелы
+    if text.startswith("delete:"):
+        try:
+            Id_To_Delete = int(text.split(":")[1].strip()) - 1  # Индексация с 0
+            with open("bdbd.json", "r") as file:
+                data = json.load(file)
+            if Id_To_Delete < 0 or Id_To_Delete >= len(data):
+                await message.answer("Неверный ID для удаления.")
+                return
+            data.pop(Id_To_Delete)
+            with open('bdbd.json', 'w') as file:
+                json.dump(data, file, indent=4)
+            await message.answer(f"Запись с ID {Id_To_Delete + 1} успешно удалена. Чтобы вернуться в режим удаления напишите /deleter")
+            await state.clear()
+        except (IndexError, ValueError):
+            await message.answer("Неверный формат команды. Используйте 'delete: <айди записи>'.")
+    elif text.lower() == 'dedeleter':
         await state.clear()
         await message.answer('Вы вышли из режима удаления, чтобы вернуться, напишите /deleter')
-@router.message(Command("delete:"), Helper.Delete_input)
-async def delete_record(message: types.Message,state:FSMContext):
-    Id_To_Delete = int(message.text.split(": ")[1])
-    Id_To_Delete = Id_To_Delete - 1
-    with open("bdbd.json", "r") as file:
-        data = json.load(file)
-
-    data.pop(Id_To_Delete)
-    print(data)
-    with open('bdbd.json', 'w') as file:
-        json.dump(data, file, indent=4)
-        print("data:", data)
-    await message.answer(f"Запись с ID {Id_To_Delete + 1} успешно удалена. Чтобы вернуться в режим удаления напишите /deleter")
-    await state.clear()
+    else:
+        await message.answer("Пожалуйста, используйте команду в формате 'delete: <айди записи>'.")
