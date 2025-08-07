@@ -33,15 +33,16 @@ async def cmd_start(message: types.Message,state:FSMContext):
         resize_keyboard=True,
         input_field_placeholder="Поддержка компании ООО _Тмыв бабла_"
     )
-    await message.answer("Вы написали в поддержку компании ООО _Тмыв бабла_, выберите нужную вам опцию", reply_markup=keyboard)
+    hello_user = " ⚙️Вы написали в поддержку компании ООО 'Тмыв бабла' \n⌨️Выберите нужную вам опцию в клавиатуре"
+    await message.answer( hello_user, reply_markup=keyboard)
 
 @dp.message(F.text.lower() == "faq")
 async def with_puree(message: types.Message):
-    await message.reply("Если сайт не работает - перезагрузите ваш компьютер. Если FAQ оказалась недостаточной, просто напишите Помогите", reply_markup=types.ReplyKeyboardRemove())
+    await message.reply("🔄Если сайт не работает - перезагрузите ваш компьютер.\n⚙️Если FAQ оказалась недостаточной, просто напишите 'помогите' и отправьте запрос о помощи в поддержку")
 
 @dp.message(F.text.lower() == "помогите")
 async def without_puree(message: types.Message,state:FSMContext):
-    await message.reply("Подробно опишите вашу проблему, укажите контакты, по которым можно с вами связаться и в ближайшее время с вами свяжется наш администратор", reply_markup=types.ReplyKeyboardRemove())
+    await message.reply("⚠️Подробно опишите вашу проблему. \n✉️Можете прикрепить ссылки на изображения проблем, которые случились при работе с сайтом. \n📱Укажите контакты, по которым можно с вами связаться и в ближайшее время с вами свяжется наш администратор", reply_markup=types.ReplyKeyboardRemove())
     global schet
     schet += 1
     return await state.set_state(Message_to_group.help_input)
@@ -51,14 +52,13 @@ async def obrabotka_zaprosa(message: types.Message, state: FSMContext ):
     text = message.text
     data = await state.get_data()
     if text != "Стоп":
-        await message.reply(message.text)
+        await message.reply("📥Сохранено")
         mass = data.get("message_saved", [])
         mass.append(text)
         await state.update_data(message_saved = mass)
     else:
-        await message.reply("Отправлено")
+        await message.reply("📤Отправлено")
         mass = data.get("message_saved")
-        await message.reply("\n".join(mass))
         textfromuser = "\n".join(mass)
         username = message.from_user.username
         spisok = {
@@ -78,7 +78,7 @@ async def obrabotka_zaprosa(message: types.Message, state: FSMContext ):
         print(schet)
         await state.clear()
         #messageforgroup = "\n".join(mass)
-        await bot.send_message(-4681080381, "Отправили новый запрос о помощи, чтобы просмотреть его, откройте бота и напишите /admin    " + "\nИмя пользователя: @" + message.from_user.username)
+        #  await bot.send_message(-4681080381, "Отправили новый запрос о помощи, чтобы просмотреть его, откройте бота и напишите /admin    " + "\nИмя пользователя: @" + message.from_user.username)
         #await bot.send_message(-4681080381, messageforgroup + "\nИмя пользователя: @" + message.from_user.username)
 
 if __name__ == "__main__":
